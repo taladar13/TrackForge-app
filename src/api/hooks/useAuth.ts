@@ -47,10 +47,10 @@ export const useMe = () => {
 
 export const useIsAuthenticated = () => {
   const { data, isLoading } = useMe();
-  
+
   return {
-    isAuthenticated: !!data && !isLoading,
-    isLoading,
+    isAuthenticated: Boolean(data && !isLoading),
+    isLoading: Boolean(isLoading),
     user: data,
   };
 };
