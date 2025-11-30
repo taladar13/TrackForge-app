@@ -1,13 +1,13 @@
 // File: src/components/Input.tsx
 
 import React from 'react';
-import { View, TextInput, Text, StyleSheet, TextInputProps } from 'react-native';
+import { View, TextInput, Text, StyleSheet, TextInputProps, ViewStyle } from 'react-native';
 import { colors, spacing, borderRadius, typography } from '../theme';
 
 interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
-  containerStyle?: any;
+  containerStyle?: ViewStyle;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -23,9 +23,17 @@ export const Input: React.FC<InputProps> = ({
       <TextInput
         style={[styles.input, error && styles.inputError, style]}
         placeholderTextColor={colors.textTertiary}
+        accessibilityLabel={label || props.placeholder}
+        accessibilityHint={error}
+        accessibilityState={{ disabled: props.editable === false }}
+        accessible={true}
         {...props}
       />
-      {error && <Text style={styles.error}>{error}</Text>}
+      {error && (
+        <Text style={styles.error} accessibilityLiveRegion="polite">
+          {error}
+        </Text>
+      )}
     </View>
   );
 };

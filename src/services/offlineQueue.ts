@@ -1,5 +1,6 @@
 // File: src/services/offlineQueue.ts
 
+import { v4 as uuidv4 } from 'uuid';
 import { storage } from '../utils/storage';
 import { workoutApi, CreateWorkoutSessionRequest } from '../api/endpoints/workout';
 import { WorkoutSession, OfflineQueueItem } from '../types';
@@ -12,9 +13,9 @@ class OfflineQueueService {
   async addWorkoutSession(sessionData: Partial<WorkoutSession>): Promise<string> {
     const queue = await this.getQueue();
     const item: OfflineQueueItem = {
-      id: `offline_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `offline_${uuidv4()}`,
       type: 'workout_session',
-      data: sessionData as any,
+      data: sessionData,
       timestamp: new Date().toISOString(),
       retries: 0,
     };
@@ -64,8 +65,13 @@ class OfflineQueueService {
           item.retries = (item.retries || 0) + 1;
           failed++;
 
-          // Remove if too many retries
+          // Remove if too many retries and log warning
           if (item.retries >= 3) {
+            console.warn(
+              `Failed to sync workout session after 3 attempts. Item ID: ${item.id}`,
+              error
+            );
+            // TODO: Consider persisting failed items in a separate storage for manual recovery
             workingQueue = workingQueue.filter((q) => q.id !== item.id);
           } else {
             const itemIndex = workingQueue.findIndex((q) => q.id === item.id);

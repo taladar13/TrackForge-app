@@ -1,10 +1,13 @@
 // File: src/api/client.ts
 
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import Constants from 'expo-constants';
 import { storage } from '../utils/storage';
 import { ApiError, AuthTokens } from '../types';
 
-const API_BASE_URL = 'https://api.trackforge.example';
+// Get API URL from app.json extra config, fallback to dev URL in development
+const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl ||
+  (__DEV__ ? 'http://localhost:3000' : 'https://api.trackforge.com');
 
 type AxiosRequestConfigWithRetry = InternalAxiosRequestConfig & { _retry?: boolean };
 type RefreshSubscriber = (token: string) => void;

@@ -10,4 +10,6 @@ npm-debug.*
 *.orig.*
 web-build/
 *.log
+.DS_Store
+**/.DS_Store
 

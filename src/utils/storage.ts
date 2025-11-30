@@ -1,6 +1,7 @@
 // File: src/utils/storage.ts
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { OfflineQueueItem } from '../types';
 
 const STORAGE_KEYS = {
@@ -10,27 +11,52 @@ const STORAGE_KEYS = {
 } as const;
 
 export const storage = {
-  // Auth
+  // Auth - Using SecureStore for sensitive data
   async getAuthTokens(): Promise<{ accessToken: string; refreshToken: string } | null> {
-    const data = await AsyncStorage.getItem(STORAGE_KEYS.AUTH_TOKENS);
-    return data ? JSON.parse(data) : null;
+    try {
+      const data = await SecureStore.getItemAsync(STORAGE_KEYS.AUTH_TOKENS);
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      console.error('Error getting auth tokens:', error);
+      return null;
+    }
   },
 
   async setAuthTokens(tokens: { accessToken: string; refreshToken: string }): Promise<void> {
-    await AsyncStorage.setItem(STORAGE_KEYS.AUTH_TOKENS, JSON.stringify(tokens));
+    try {
+      await SecureStore.setItemAsync(STORAGE_KEYS.AUTH_TOKENS, JSON.stringify(tokens));
+    } catch (error) {
+      console.error('Error setting auth tokens:', error);
+      throw error;
+    }
   },
 
   async clearAuthTokens(): Promise<void> {
-    await AsyncStorage.removeItem(STORAGE_KEYS.AUTH_TOKENS);
-    await AsyncStorage.removeItem(STORAGE_KEYS.USER_ID);
+    try {
+      await SecureStore.deleteItemAsync(STORAGE_KEYS.AUTH_TOKENS);
+      await SecureStore.deleteItemAsync(STORAGE_KEYS.USER_ID);
+    } catch (error) {
+      // Ignore errors when deleting
+      console.error('Error clearing auth tokens:', error);
+    }
   },
 
   async getUserId(): Promise<string | null> {
-    return await AsyncStorage.getItem(STORAGE_KEYS.USER_ID);
+    try {
+      return await SecureStore.getItemAsync(STORAGE_KEYS.USER_ID);
+    } catch (error) {
+      console.error('Error getting user ID:', error);
+      return null;
+    }
   },
 
   async setUserId(userId: string): Promise<void> {
-    await AsyncStorage.setItem(STORAGE_KEYS.USER_ID, userId);
+    try {
+      await SecureStore.setItemAsync(STORAGE_KEYS.USER_ID, userId);
+    } catch (error) {
+      console.error('Error setting user ID:', error);
+      throw error;
+    }
   },
 
   // Offline Queue

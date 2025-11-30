@@ -3,11 +3,13 @@
 import React from 'react';
 import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useForm, Controller } from 'react-hook-form';
 import { Input, Button } from '../../../components';
 import { colors, spacing, typography } from '../../../theme';
 import { useRegister } from '../../../api/hooks';
 import { useAuthStore } from '../../../store/authStore';
+import { AuthStackParamList } from '../../../navigation/types';
 
 interface RegisterFormData {
   email: string;
@@ -15,8 +17,10 @@ interface RegisterFormData {
   confirmPassword: string;
 }
 
+type RegisterScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Register'>;
+
 export const RegisterScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<RegisterScreenNavigationProp>();
   const registerMutation = useRegister();
   const setUser = useAuthStore((state) => state.setUser);
 
@@ -30,9 +34,9 @@ export const RegisterScreen: React.FC = () => {
         password: data.password,
       });
       setUser(response.user);
-      navigation.navigate('Auth' as any, { screen: 'Onboarding' });
+      navigation.navigate('Onboarding');
     } catch (error) {
-      // Error handled by React Query
+      // Error will be displayed below via registerMutation.error
     }
   };
 
@@ -110,6 +114,14 @@ export const RegisterScreen: React.FC = () => {
           )}
         />
 
+        {registerMutation.error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>
+              {registerMutation.error.message || 'Registration failed. Please try again.'}
+            </Text>
+          </View>
+        )}
+
         <Button
           title="Sign Up"
           onPress={handleSubmit(onSubmit)}
@@ -148,6 +160,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.textSecondary,
     marginBottom: spacing.xl,
+  },
+  errorContainer: {
+    backgroundColor: colors.error + '20',
+    padding: spacing.md,
+    borderRadius: 8,
+    marginTop: spacing.md,
+  },
+  errorText: {
+    ...typography.bodySmall,
+    color: colors.error,
+    textAlign: 'center',
   },
   button: {
     marginTop: spacing.md,
