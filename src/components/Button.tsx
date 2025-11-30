@@ -12,6 +12,8 @@ interface ButtonProps {
   disabled?: boolean;
   loading?: boolean;
   style?: ViewStyle;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -22,6 +24,8 @@ export const Button: React.FC<ButtonProps> = ({
   disabled = false,
   loading = false,
   style,
+  accessibilityLabel,
+  accessibilityHint,
 }) => {
   const buttonStyles: ViewStyle[] = [styles.button, styles[`button_${variant}`], styles[`button_${size}`]];
   const textStyles: TextStyle[] = [styles.text, styles[`text_${variant}`], styles[`text_${size}`]];
@@ -36,9 +40,16 @@ export const Button: React.FC<ButtonProps> = ({
       onPress={onPress}
       disabled={disabled || loading}
       activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel || title}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? colors.textInverse : colors.primary} />
+        <ActivityIndicator
+          color={variant === 'primary' ? colors.textInverse : colors.primary}
+          accessibilityLabel="Loading"
+        />
       ) : (
         <Text style={textStyles}>{title}</Text>
       )}

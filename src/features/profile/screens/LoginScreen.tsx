@@ -1,22 +1,25 @@
 // File: src/features/profile/screens/LoginScreen.tsx
 
 import React from 'react';
-import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useForm, Controller } from 'react-hook-form';
 import { Input, Button } from '../../../components';
 import { colors, spacing, typography } from '../../../theme';
 import { useLogin } from '../../../api/hooks';
 import { useAuthStore } from '../../../store/authStore';
-import { Text } from 'react-native';
+import { AuthStackParamList } from '../../../navigation/types';
 
 interface LoginFormData {
   email: string;
   password: string;
 }
 
+type LoginScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
+
 export const LoginScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<LoginScreenNavigationProp>();
   const loginMutation = useLogin();
   const setUser = useAuthStore((state) => state.setUser);
 
@@ -28,7 +31,7 @@ export const LoginScreen: React.FC = () => {
       setUser(response.user);
       // Navigation handled by RootNavigator when auth state changes
     } catch (error) {
-      // Error handled by React Query
+      // Error will be displayed below via loginMutation.error
     }
   };
 
@@ -86,6 +89,14 @@ export const LoginScreen: React.FC = () => {
           )}
         />
 
+        {loginMutation.error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>
+              {loginMutation.error.message || 'Login failed. Please try again.'}
+            </Text>
+          </View>
+        )}
+
         <Button
           title="Log In"
           onPress={handleSubmit(onSubmit)}
@@ -95,7 +106,7 @@ export const LoginScreen: React.FC = () => {
 
         <Button
           title="Don't have an account? Sign up"
-          onPress={() => navigation.navigate('Auth' as any, { screen: 'Register' })}
+          onPress={() => navigation.navigate('Register')}
           variant="text"
           style={styles.linkButton}
         />
@@ -124,6 +135,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.textSecondary,
     marginBottom: spacing.xl,
+  },
+  errorContainer: {
+    backgroundColor: colors.error + '20',
+    padding: spacing.md,
+    borderRadius: 8,
+    marginTop: spacing.md,
+  },
+  errorText: {
+    ...typography.bodySmall,
+    color: colors.error,
+    textAlign: 'center',
   },
   button: {
     marginTop: spacing.md,

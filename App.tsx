@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider, focusManager, onlineManager } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { RootNavigator } from './src/navigation/RootNavigator';
+import { ErrorBoundary } from './src/components';
 import { offlineQueueService } from './src/services/offlineQueue';
 import { useOfflineStore } from './src/store/offlineStore';
 import NetInfo from '@react-native-community/netinfo';
@@ -58,11 +59,7 @@ const OfflineSyncHandler: React.FC = () => {
 
   useEffect(() => {
     if (isOnline) {
-      offlineQueueService.syncQueue().then(({ synced }) => {
-        if (synced > 0) {
-          console.log(`Synced ${synced} offline items`);
-        }
-      });
+      offlineQueueService.syncQueue();
     }
   }, [isOnline]);
 
@@ -71,11 +68,13 @@ const OfflineSyncHandler: React.FC = () => {
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <StatusBar style="auto" />
-      <OfflineSyncHandler />
-      <RootNavigator />
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <StatusBar style="auto" />
+        <OfflineSyncHandler />
+        <RootNavigator />
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

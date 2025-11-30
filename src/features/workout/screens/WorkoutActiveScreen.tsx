@@ -1,8 +1,9 @@
 // File: src/features/workout/screens/WorkoutActiveScreen.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { format } from 'date-fns';
 import { Button } from '../../../components';
 import { colors, spacing, typography } from '../../../theme';
@@ -11,6 +12,7 @@ import { offlineQueueService } from '../../../services/offlineQueue';
 import { useOfflineStore } from '../../../store/offlineStore';
 import { WorkoutSet, Exercise } from '../../../types';
 import { calculateTotalVolume, calculate1RM } from '../../../utils/calculations';
+import { WorkoutStackParamList } from '../../../navigation/types';
 
 interface ExerciseState {
   exerciseId: string;
@@ -18,10 +20,13 @@ interface ExerciseState {
   sets: WorkoutSet[];
 }
 
+type WorkoutActiveScreenNavigationProp = NativeStackNavigationProp<WorkoutStackParamList, 'WorkoutActive'>;
+type WorkoutActiveScreenRouteProp = RouteProp<WorkoutStackParamList, 'WorkoutActive'>;
+
 export const WorkoutActiveScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const route = useRoute();
-  const workoutId = (route.params as any)?.workoutId;
+  const navigation = useNavigation<WorkoutActiveScreenNavigationProp>();
+  const route = useRoute<WorkoutActiveScreenRouteProp>();
+  const workoutId = route.params?.workoutId;
   
   const { data: plannedWorkout } = useTodayWorkout(new Date());
   const createSessionMutation = useCreateWorkoutSession();
@@ -97,9 +102,9 @@ export const WorkoutActiveScreen: React.FC = () => {
     }
   };
 
-  const totalVolume = exercises.reduce(
-    (total, ex) => total + calculateTotalVolume(ex.sets),
-    0
+  const totalVolume = useMemo(
+    () => exercises.reduce((total, ex) => total + calculateTotalVolume(ex.sets), 0),
+    [exercises]
   );
 
   return (
