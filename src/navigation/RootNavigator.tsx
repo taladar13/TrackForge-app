@@ -15,7 +15,7 @@ export const RootNavigator: React.FC = () => {
   const { isAuthenticated, isLoading } = useIsAuthenticated();
 
   if (isLoading) {
-    return <LoadingSpinner fullScreen />;
+    return <LoadingSpinner fullScreen={true} />;
   }
 
   return (
