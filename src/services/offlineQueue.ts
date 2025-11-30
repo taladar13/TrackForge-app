@@ -4,6 +4,7 @@ import { storage } from '../utils/storage';
 import { workoutApi, CreateWorkoutSessionRequest } from '../api/endpoints/workout';
 import { WorkoutSession, OfflineQueueItem } from '../types';
 import NetInfo from '@react-native-community/netinfo';
+import { useOfflineStore } from '../store/offlineStore';
 
 const OFFLINE_QUEUE_KEY = '@trackforge/offline_queue';
 
@@ -17,8 +18,9 @@ class OfflineQueueService {
       timestamp: new Date().toISOString(),
       retries: 0,
     };
-    queue.push(item);
-    await storage.addToOfflineQueue(item);
+    const nextQueue = [...queue, item];
+    await storage.setOfflineQueue(nextQueue);
+    useOfflineStore.setState({ pendingSyncCount: nextQueue.length });
     return item.id;
   }
 
@@ -27,11 +29,15 @@ class OfflineQueueService {
   }
 
   async removeItem(itemId: string): Promise<void> {
-    await storage.removeFromOfflineQueue(itemId);
+    const queue = await this.getQueue();
+    const filtered = queue.filter((item) => item.id !== itemId);
+    await storage.setOfflineQueue(filtered);
+    useOfflineStore.setState({ pendingSyncCount: filtered.length });
   }
 
   async clearQueue(): Promise<void> {
     await storage.clearOfflineQueue();
+    useOfflineStore.setState({ pendingSyncCount: 0 });
   }
 
   async syncQueue(): Promise<{ synced: number; failed: number }> {
@@ -41,37 +47,40 @@ class OfflineQueueService {
     }
 
     const queue = await this.getQueue();
+    let workingQueue: OfflineQueueItem[] = [...queue];
     let synced = 0;
     let failed = 0;
+    let queueChanged = false;
 
     for (const item of queue) {
       if (item.type === 'workout_session') {
         try {
           await workoutApi.createSession(item.data as CreateWorkoutSessionRequest);
-          await this.removeItem(item.id);
+          workingQueue = workingQueue.filter((q) => q.id !== item.id);
+          queueChanged = true;
           synced++;
         } catch (error) {
           // Increment retry count
           item.retries = (item.retries || 0) + 1;
           failed++;
-          
+
           // Remove if too many retries
           if (item.retries >= 3) {
-            await this.removeItem(item.id);
+            workingQueue = workingQueue.filter((q) => q.id !== item.id);
           } else {
-            // Update queue with new retry count
-            const updatedQueue = await this.getQueue();
-            const itemIndex = updatedQueue.findIndex((q) => q.id === item.id);
+            const itemIndex = workingQueue.findIndex((q) => q.id === item.id);
             if (itemIndex !== -1) {
-              updatedQueue[itemIndex] = item;
-              await storage.clearOfflineQueue();
-              for (const queueItem of updatedQueue) {
-                await storage.addToOfflineQueue(queueItem);
-              }
+              workingQueue[itemIndex] = { ...item };
             }
           }
+          queueChanged = true;
         }
       }
+    }
+
+    if (queueChanged) {
+      await storage.setOfflineQueue(workingQueue);
+      useOfflineStore.setState({ pendingSyncCount: workingQueue.length });
     }
 
     return { synced, failed };

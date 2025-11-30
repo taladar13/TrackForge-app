@@ -1,6 +1,7 @@
 // File: src/utils/storage.ts
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { OfflineQueueItem } from '../types';
 
 const STORAGE_KEYS = {
   AUTH_TOKENS: '@trackforge/auth_tokens',
@@ -33,21 +34,13 @@ export const storage = {
   },
 
   // Offline Queue
-  async getOfflineQueue(): Promise<any[]> {
+  async getOfflineQueue(): Promise<OfflineQueueItem[]> {
     const data = await AsyncStorage.getItem(STORAGE_KEYS.OFFLINE_QUEUE);
     return data ? JSON.parse(data) : [];
   },
 
-  async addToOfflineQueue(item: any): Promise<void> {
-    const queue = await storage.getOfflineQueue();
-    queue.push(item);
+  async setOfflineQueue(queue: OfflineQueueItem[]): Promise<void> {
     await AsyncStorage.setItem(STORAGE_KEYS.OFFLINE_QUEUE, JSON.stringify(queue));
-  },
-
-  async removeFromOfflineQueue(itemId: string): Promise<void> {
-    const queue = await storage.getOfflineQueue();
-    const filtered = queue.filter((item: any) => item.id !== itemId);
-    await AsyncStorage.setItem(STORAGE_KEYS.OFFLINE_QUEUE, JSON.stringify(filtered));
   },
 
   async clearOfflineQueue(): Promise<void> {
