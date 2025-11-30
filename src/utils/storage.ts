@@ -5,9 +5,9 @@ import * as SecureStore from 'expo-secure-store';
 import { OfflineQueueItem } from '../types';
 
 const STORAGE_KEYS = {
-  AUTH_TOKENS: '@trackforge/auth_tokens',
-  USER_ID: '@trackforge/user_id',
-  OFFLINE_QUEUE: '@trackforge/offline_queue',
+  AUTH_TOKENS: 'trackforge_auth_tokens',
+  USER_ID: 'trackforge_user_id',
+  OFFLINE_QUEUE: '@trackforge/offline_queue', // AsyncStorage allows @ and /
 } as const;
 
 export const storage = {
