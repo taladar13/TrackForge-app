@@ -1,12 +1,13 @@
 // File: App.tsx
 
 import React, { useEffect } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, focusManager, onlineManager } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { offlineQueueService } from './src/services/offlineQueue';
 import { useOfflineStore } from './src/store/offlineStore';
 import NetInfo from '@react-native-community/netinfo';
+import { AppState, AppStateStatus } from 'react-native';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,48 +18,53 @@ const queryClient = new QueryClient({
   },
 });
 
+onlineManager.setEventListener((setOnline) => {
+  const unsubscribe = NetInfo.addEventListener((state) => {
+    const isOnline = state.isConnected ?? false;
+    setOnline(isOnline);
+    useOfflineStore.setState({ isOnline });
+  });
+
+  return () => unsubscribe();
+});
+
+focusManager.setEventListener((handleFocus) => {
+  const onAppStateChange = (status: AppStateStatus) => {
+    handleFocus(status === 'active');
+  };
+
+  const subscription = AppState.addEventListener('change', onAppStateChange);
+  return () => subscription.remove();
+});
+
 // Component to handle offline sync
 const OfflineSyncHandler: React.FC = () => {
+  const isOnline = useOfflineStore((state) => state.isOnline);
+
   useEffect(() => {
-    // Monitor network status
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      const isOnline = state.isConnected ?? false;
-      useOfflineStore.setState({ isOnline });
-
-      // Sync queue when coming back online
-      if (isOnline) {
-        offlineQueueService.syncQueue().then(({ synced, failed }) => {
-          if (synced > 0) {
-            console.log(`Synced ${synced} offline items`);
-          }
-        });
-      }
-    });
-
-    // Initial sync check
     NetInfo.fetch().then((state) => {
-      const isOnline = state.isConnected ?? false;
-      useOfflineStore.setState({ isOnline });
-      
-      if (isOnline) {
+      const initialOnline = state.isConnected ?? false;
+      onlineManager.setOnline(initialOnline);
+      useOfflineStore.setState({ isOnline: initialOnline });
+      offlineQueueService.getQueue().then((queue) => {
+        useOfflineStore.setState({ pendingSyncCount: queue.length });
+      });
+
+      if (initialOnline) {
         offlineQueueService.syncQueue();
       }
     });
+  }, []);
 
-    // Periodic sync (every 30 seconds)
-    const syncInterval = setInterval(() => {
-      NetInfo.fetch().then((state) => {
-        if (state.isConnected) {
-          offlineQueueService.syncQueue();
+  useEffect(() => {
+    if (isOnline) {
+      offlineQueueService.syncQueue().then(({ synced }) => {
+        if (synced > 0) {
+          console.log(`Synced ${synced} offline items`);
         }
       });
-    }, 30000);
-
-    return () => {
-      unsubscribe();
-      clearInterval(syncInterval);
-    };
-  }, []);
+    }
+  }, [isOnline]);
 
   return null;
 };
