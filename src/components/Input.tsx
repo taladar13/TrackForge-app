@@ -25,7 +25,6 @@ export const Input: React.FC<InputProps> = ({
         placeholderTextColor={colors.textTertiary}
         accessibilityLabel={label || props.placeholder}
         accessibilityHint={error}
-        accessibilityState={{ disabled: props.editable === false }}
         {...props}
       />
       {error && (
