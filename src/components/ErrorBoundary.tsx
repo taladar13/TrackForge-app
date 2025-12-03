@@ -33,6 +33,9 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // Log error to error reporting service
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    if (error?.stack) {
+      console.error('ErrorBoundary stack trace:', error.stack);
+    }
   }
 
   resetError = (): void => {
