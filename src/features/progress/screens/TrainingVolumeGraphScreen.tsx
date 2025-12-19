@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { VictoryBar, VictoryChart, VictoryAxis, VictoryTheme } from 'victory-native';
 import { format, subWeeks } from 'date-fns';
 import { Card } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 import { useTrainingVolume } from '../../../api/hooks';
 
 export const TrainingVolumeGraphScreen: React.FC = () => {
@@ -84,13 +84,13 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   sectionTitle: {
-    ...typography.h4,
+    ...textStyles.h4,
     fontWeight: typography.fontWeight.bold,
     marginBottom: spacing.md,
     padding: spacing.md,
   },
   emptyText: {
-    ...typography.body,
+    ...textStyles.body,
     color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.xl,

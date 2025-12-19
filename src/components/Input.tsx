@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { View, TextInput, Text, StyleSheet, TextInputProps, ViewStyle } from 'react-native';
-import { colors, spacing, borderRadius, typography } from '../theme';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -22,15 +21,11 @@ export const Input: React.FC<InputProps> = ({
       {label && <Text style={styles.label}>{label}</Text>}
       <TextInput
         style={[styles.input, error && styles.inputError, style]}
-        placeholderTextColor={colors.textTertiary}
-        accessibilityLabel={label || props.placeholder}
-        accessibilityHint={error}
-        accessibilityState={{ disabled: props.editable === false }}
-        accessible={true}
+        placeholderTextColor="#9CA3AF"
         {...props}
       />
       {error && (
-        <Text style={styles.error} accessibilityLiveRegion="polite">
+        <Text style={styles.error}>
           {error}
         </Text>
       )}
@@ -40,32 +35,36 @@ export const Input: React.FC<InputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: spacing.sm,
+    marginVertical: 8,
   },
   label: {
-    ...typography.bodySmall,
-    fontWeight: typography.fontWeight.medium,
-    color: colors.textSecondary,
-    marginBottom: spacing.xs,
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#6B7280',
+    marginBottom: 4,
+    lineHeight: 21,
   },
   input: {
-    ...typography.body,
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 24,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    backgroundColor: colors.background,
-    color: colors.text,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#FFFFFF',
+    color: '#111827',
     minHeight: 44,
   },
   inputError: {
-    borderColor: colors.error,
+    borderColor: '#EF4444',
   },
   error: {
-    ...typography.caption,
-    color: colors.error,
-    marginTop: spacing.xs,
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#EF4444',
+    marginTop: 4,
+    lineHeight: 18,
   },
 });
-

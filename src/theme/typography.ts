@@ -1,5 +1,10 @@
 // File: src/theme/typography.ts
 
+import { TextStyle } from 'react-native';
+
+// Use React Native's expected fontWeight type
+type FontWeight = TextStyle['fontWeight'];
+
 export const typography = {
   fontFamily: {
     regular: 'System',
@@ -23,53 +28,53 @@ export const typography = {
     relaxed: 1.75,
   },
   fontWeight: {
-    regular: '400' as const,
-    medium: '500' as const,
-    semibold: '600' as const,
-    bold: '700' as const,
+    regular: '400' as FontWeight,
+    medium: '500' as FontWeight,
+    semibold: '600' as FontWeight,
+    bold: '700' as FontWeight,
   },
 } as const;
 
-export const textStyles = {
+// Pre-calculated text styles with proper types
+export const textStyles: Record<string, TextStyle> = {
   h1: {
     fontSize: typography.fontSize['4xl'],
-    fontWeight: typography.fontWeight.bold,
-    lineHeight: typography.lineHeight.tight,
+    fontWeight: '700',
+    lineHeight: Math.round(typography.fontSize['4xl'] * typography.lineHeight.tight),
   },
   h2: {
     fontSize: typography.fontSize['3xl'],
-    fontWeight: typography.fontWeight.bold,
-    lineHeight: typography.lineHeight.tight,
+    fontWeight: '700',
+    lineHeight: Math.round(typography.fontSize['3xl'] * typography.lineHeight.tight),
   },
   h3: {
     fontSize: typography.fontSize['2xl'],
-    fontWeight: typography.fontWeight.semibold,
-    lineHeight: typography.lineHeight.normal,
+    fontWeight: '600',
+    lineHeight: Math.round(typography.fontSize['2xl'] * typography.lineHeight.normal),
   },
   h4: {
     fontSize: typography.fontSize.xl,
-    fontWeight: typography.fontWeight.semibold,
-    lineHeight: typography.lineHeight.normal,
+    fontWeight: '600',
+    lineHeight: Math.round(typography.fontSize.xl * typography.lineHeight.normal),
   },
   body: {
     fontSize: typography.fontSize.base,
-    fontWeight: typography.fontWeight.regular,
-    lineHeight: typography.lineHeight.normal,
+    fontWeight: '400',
+    lineHeight: Math.round(typography.fontSize.base * typography.lineHeight.normal),
   },
   bodySmall: {
     fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.regular,
-    lineHeight: typography.lineHeight.normal,
+    fontWeight: '400',
+    lineHeight: Math.round(typography.fontSize.sm * typography.lineHeight.normal),
   },
   caption: {
     fontSize: typography.fontSize.xs,
-    fontWeight: typography.fontWeight.regular,
-    lineHeight: typography.lineHeight.normal,
+    fontWeight: '400',
+    lineHeight: Math.round(typography.fontSize.xs * typography.lineHeight.normal),
   },
   button: {
     fontSize: typography.fontSize.base,
-    fontWeight: typography.fontWeight.semibold,
-    lineHeight: typography.lineHeight.normal,
+    fontWeight: '600',
+    lineHeight: Math.round(typography.fontSize.base * typography.lineHeight.normal),
   },
-} as const;
-
+};

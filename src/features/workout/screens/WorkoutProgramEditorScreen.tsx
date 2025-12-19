@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Input, Button } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, textStyles } from '../../../theme';
 import { useWorkoutPrograms, useCreateWorkoutProgram, useUpdateWorkoutProgram } from '../../../api/hooks';
 
 // Simplified version - full implementation would include exercise selection and split configuration
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   note: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
     marginTop: spacing.md,
     marginBottom: spacing.md,

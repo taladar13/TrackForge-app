@@ -4,10 +4,45 @@ import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'ax
 import Constants from 'expo-constants';
 import { storage } from '../utils/storage';
 import { ApiError, AuthTokens } from '../types';
+import { setupMockApi } from '../mocks/setupMockApi';
 
-// Get API URL from app.json extra config, fallback to dev URL in development
-const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl ||
-  (__DEV__ ? 'http://localhost:3000' : 'https://api.trackforge.com');
+type ExpoExtra = {
+  apiUrl?: string;
+  devApiPort?: number;
+  useMocks?: boolean;
+};
+
+const manifestExtra =
+  (Constants.expoConfig?.extra as ExpoExtra | undefined) ||
+  ((Constants.manifest as { extra?: ExpoExtra } | null)?.extra);
+
+const getDevLanUrl = (): string | null => {
+  const hostUri =
+    Constants.expoConfig?.hostUri ||
+    (Constants.manifest as { hostUri?: string; debuggerHost?: string } | null)?.hostUri ||
+    (Constants.manifest as { debuggerHost?: string } | null)?.debuggerHost;
+
+  if (!hostUri) {
+    return null;
+  }
+
+  const host = hostUri.split(':')[0];
+  if (!host) {
+    return null;
+  }
+
+  const port = manifestExtra?.devApiPort ?? 3000;
+  return `http://${host}:${port}`;
+};
+
+// Determine API URL with support for Expo Go + LAN devices
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL ||
+  manifestExtra?.apiUrl ||
+  (__DEV__ && getDevLanUrl()) ||
+  'https://api.trackforge.com';
+
+const USE_MOCKS = manifestExtra?.useMocks === true || process.env.EXPO_PUBLIC_USE_MOCKS === 'true';
 
 type AxiosRequestConfigWithRetry = InternalAxiosRequestConfig & { _retry?: boolean };
 type RefreshSubscriber = (token: string) => void;
@@ -27,6 +62,10 @@ class ApiClient {
         'Content-Type': 'application/json',
       },
     });
+
+    if (USE_MOCKS) {
+      setupMockApi(this.client);
+    }
 
     this.setupInterceptors();
   }

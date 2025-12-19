@@ -3,7 +3,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Button } from './Button';
-import { colors, spacing, typography } from '../theme';
 
 interface ErrorViewProps {
   message: string;
@@ -26,16 +25,17 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: spacing.xl,
+    padding: 32,
   },
   message: {
-    ...typography.body,
-    color: colors.error,
+    fontSize: 16,
+    fontWeight: '400',
+    color: '#EF4444',
     textAlign: 'center',
-    marginBottom: spacing.md,
+    marginBottom: 16,
+    lineHeight: 24,
   },
   button: {
-    marginTop: spacing.md,
+    marginTop: 16,
   },
 });
-

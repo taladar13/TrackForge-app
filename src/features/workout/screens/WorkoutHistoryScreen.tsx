@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native
 import { useNavigation } from '@react-navigation/native';
 import { format, subDays } from 'date-fns';
 import { Card } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 import { useWorkoutSessions } from '../../../api/hooks';
 import { WorkoutSession } from '../../../types';
 
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   sectionHeader: {
-    ...typography.h4,
+    ...textStyles.h4,
     fontWeight: typography.fontWeight.semibold,
     marginTop: spacing.md,
     marginBottom: spacing.sm,
@@ -122,24 +122,24 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   sessionName: {
-    ...typography.body,
+    ...textStyles.body,
     fontWeight: typography.fontWeight.semibold,
   },
   sessionDate: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
   },
   sessionStats: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
   },
   syncingText: {
-    ...typography.caption,
+    ...textStyles.caption,
     color: colors.warning,
     marginTop: spacing.xs,
   },
   emptyText: {
-    ...typography.body,
+    ...textStyles.body,
     color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.xl,

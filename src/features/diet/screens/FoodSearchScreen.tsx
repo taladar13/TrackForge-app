@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Input } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 import { useSearchFoods, useLogDietItem } from '../../../api/hooks';
 import { FoodItem } from '../../../types';
 
@@ -74,16 +74,16 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   foodName: {
-    ...typography.body,
+    ...textStyles.body,
     fontWeight: typography.fontWeight.medium,
     marginBottom: spacing.xs,
   },
   foodMacros: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
   },
   emptyText: {
-    ...typography.body,
+    ...textStyles.body,
     color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.xl,

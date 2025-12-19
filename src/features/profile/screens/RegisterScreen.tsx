@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useForm, Controller } from 'react-hook-form';
 import { Input, Button } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 import { useRegister } from '../../../api/hooks';
 import { useAuthStore } from '../../../store/authStore';
 import { AuthStackParamList } from '../../../navigation/types';
@@ -151,12 +151,12 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
   },
   title: {
-    ...typography.h1,
+    ...textStyles.h1,
     textAlign: 'center',
     marginBottom: spacing.sm,
   },
   subtitle: {
-    ...typography.body,
+    ...textStyles.body,
     textAlign: 'center',
     color: colors.textSecondary,
     marginBottom: spacing.xl,
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   errorText: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.error,
     textAlign: 'center',
   },
