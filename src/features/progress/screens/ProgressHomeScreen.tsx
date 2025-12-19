@@ -4,7 +4,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Card } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 
 export const ProgressHomeScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -61,17 +61,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cardTitle: {
-    ...typography.h4,
+    ...textStyles.h4,
     fontWeight: typography.fontWeight.bold,
     marginBottom: spacing.xs,
   },
   cardDescription: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
     flex: 1,
   },
   cardArrow: {
-    ...typography.h3,
+    ...textStyles.h3,
     color: colors.primary,
     marginLeft: spacing.md,
   },

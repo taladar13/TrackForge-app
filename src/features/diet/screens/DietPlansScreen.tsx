@@ -4,7 +4,7 @@ import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Card, Button } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 import { useDietPlans } from '../../../api/hooks';
 import { DietPlan } from '../../../types';
 
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   planName: {
-    ...typography.h4,
+    ...textStyles.h4,
     fontWeight: typography.fontWeight.semibold,
   },
   currentBadge: {
@@ -92,12 +92,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   currentBadgeText: {
-    ...typography.caption,
+    ...textStyles.caption,
     color: colors.textInverse,
     fontWeight: typography.fontWeight.semibold,
   },
   planDetails: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
   },
   footer: {
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.border,
   },
   emptyText: {
-    ...typography.body,
+    ...textStyles.body,
     color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.xl,

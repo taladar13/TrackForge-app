@@ -6,7 +6,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { format } from 'date-fns';
 import { Button } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 import { useTodayWorkout, useCreateWorkoutSession } from '../../../api/hooks';
 import { offlineQueueService } from '../../../services/offlineQueue';
 import { useOfflineStore } from '../../../store/offlineStore';
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   offlineText: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.warning,
     textAlign: 'center',
   },
@@ -217,12 +217,12 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   exerciseName: {
-    ...typography.h4,
+    ...textStyles.h4,
     fontWeight: typography.fontWeight.bold,
     marginBottom: spacing.xs,
   },
   exerciseStats: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
     marginBottom: spacing.md,
   },
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   setNumber: {
-    ...typography.body,
+    ...textStyles.body,
     fontWeight: typography.fontWeight.bold,
     width: 30,
   },
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: spacing.sm,
     marginHorizontal: spacing.xs,
-    ...typography.body,
+    ...textStyles.body,
   },
   checkbox: {
     width: 32,
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   addSetText: {
-    ...typography.body,
+    ...textStyles.body,
     color: colors.primary,
     fontWeight: typography.fontWeight.medium,
   },
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   summaryText: {
-    ...typography.h4,
+    ...textStyles.h4,
     fontWeight: typography.fontWeight.bold,
     color: colors.text,
   },

@@ -6,7 +6,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { format } from 'date-fns';
 import { Card, Button } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 import { useTodayWorkout } from '../../../api/hooks';
 import { useOfflineStore } from '../../../store/offlineStore';
 import { offlineQueueService } from '../../../services/offlineQueue';
@@ -111,12 +111,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   statusText: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.warning,
     fontWeight: typography.fontWeight.medium,
   },
   statusSubtext: {
-    ...typography.caption,
+    ...textStyles.caption,
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },
@@ -124,17 +124,17 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   workoutTitle: {
-    ...typography.h3,
+    ...textStyles.h3,
     fontWeight: typography.fontWeight.bold,
     marginBottom: spacing.sm,
   },
   workoutDetails: {
-    ...typography.body,
+    ...textStyles.body,
     color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
   workoutDuration: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
     marginBottom: spacing.md,
   },
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    ...typography.body,
+    ...textStyles.body,
     color: colors.textSecondary,
     marginBottom: spacing.md,
     textAlign: 'center',

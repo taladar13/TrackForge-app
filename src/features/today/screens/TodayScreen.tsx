@@ -7,7 +7,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { format, subDays, addDays } from 'date-fns';
 import { TodayStackParamList } from '../../../navigation/types';
 import { Card } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 import { useTodayDiet } from '../../../api/hooks';
 import { useTodayWorkout } from '../../../api/hooks';
 import { useWeight } from '../../../api/hooks';
@@ -163,26 +163,26 @@ const styles = StyleSheet.create({
     padding: spacing.sm,
   },
   navButtonText: {
-    ...typography.h4,
+    ...textStyles.h4,
     color: colors.primary,
   },
   dateContainer: {
     alignItems: 'center',
   },
   dateText: {
-    ...typography.h3,
+    ...textStyles.h3,
     fontWeight: typography.fontWeight.bold,
     color: colors.text,
   },
   yearText: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
   },
   card: {
     marginBottom: spacing.md,
   },
   cardTitle: {
-    ...typography.h4,
+    ...textStyles.h4,
     fontWeight: typography.fontWeight.bold,
     marginBottom: spacing.md,
     color: colors.text,
@@ -193,11 +193,11 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   progressLabel: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
   },
   progressValue: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     fontWeight: typography.fontWeight.semibold,
     color: colors.text,
   },
@@ -219,31 +219,31 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   macroText: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
   },
   adherenceText: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },
   workoutName: {
-    ...typography.body,
+    ...textStyles.body,
     fontWeight: typography.fontWeight.semibold,
     marginBottom: spacing.xs,
   },
   workoutDetails: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
   },
   weightValue: {
-    ...typography.h3,
+    ...textStyles.h3,
     fontWeight: typography.fontWeight.bold,
     color: colors.text,
     marginBottom: spacing.xs,
   },
   weightDate: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
     marginBottom: spacing.md,
   },
@@ -255,15 +255,15 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   logButtonText: {
-    ...typography.button,
+    ...textStyles.button,
     color: colors.textInverse,
   },
   loadingText: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
   },
   emptyText: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textTertiary,
     fontStyle: 'italic',
   },

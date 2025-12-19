@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { format } from 'date-fns';
 import { Card } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 import { useWorkoutSession } from '../../../api/hooks';
 import { calculate1RM } from '../../../utils/calculations';
 
@@ -94,17 +94,17 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   sessionName: {
-    ...typography.h3,
+    ...textStyles.h3,
     fontWeight: typography.fontWeight.bold,
     marginBottom: spacing.xs,
   },
   sessionDate: {
-    ...typography.body,
+    ...textStyles.body,
     color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
   duration: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
     marginBottom: spacing.md,
   },
@@ -120,24 +120,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statLabel: {
-    ...typography.caption,
+    ...textStyles.caption,
     color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
   statValue: {
-    ...typography.h4,
+    ...textStyles.h4,
     fontWeight: typography.fontWeight.bold,
   },
   exerciseCard: {
     marginBottom: spacing.md,
   },
   exerciseName: {
-    ...typography.h4,
+    ...textStyles.h4,
     fontWeight: typography.fontWeight.semibold,
     marginBottom: spacing.xs,
   },
   oneRM: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.primary,
     fontWeight: typography.fontWeight.medium,
     marginBottom: spacing.md,
@@ -148,12 +148,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   setNumber: {
-    ...typography.body,
+    ...textStyles.body,
     fontWeight: typography.fontWeight.bold,
     width: 30,
   },
   setData: {
-    ...typography.body,
+    ...textStyles.body,
     color: colors.text,
   },
 });

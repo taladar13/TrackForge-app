@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { VictoryLine, VictoryChart, VictoryAxis, VictoryTheme } from 'victory-native';
 import { format, subDays } from 'date-fns';
 import { Card } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 import { useWeight } from '../../../api/hooks';
 
 const TIME_RANGES = [
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
   },
   rangeButtonText: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.text,
   },
   rangeButtonTextActive: {
@@ -138,12 +138,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   summaryLabel: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
   summaryValue: {
-    ...typography.h2,
+    ...textStyles.h2,
     fontWeight: typography.fontWeight.bold,
     color: colors.text,
   },
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   emptyText: {
-    ...typography.body,
+    ...textStyles.body,
     color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.xl,

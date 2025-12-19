@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Input, Button } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 import { Picker } from '@react-native-picker/picker';
 
 export const OnboardingScreen: React.FC = () => {
@@ -77,12 +77,12 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
   },
   title: {
-    ...typography.h1,
+    ...textStyles.h1,
     textAlign: 'center',
     marginBottom: spacing.sm,
   },
   subtitle: {
-    ...typography.body,
+    ...textStyles.body,
     textAlign: 'center',
     color: colors.textSecondary,
     marginBottom: spacing.xl,
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   pickerLabel: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     fontWeight: typography.fontWeight.medium,
     color: colors.textSecondary,
     marginBottom: spacing.xs,

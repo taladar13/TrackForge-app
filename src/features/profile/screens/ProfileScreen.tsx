@@ -4,7 +4,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Card, Button } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 import { useMe, useLogout } from '../../../api/hooks';
 import { useAuthStore } from '../../../store/authStore';
 
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   email: {
-    ...typography.h4,
+    ...textStyles.h4,
     fontWeight: typography.fontWeight.bold,
     marginBottom: spacing.sm,
   },
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   profileText: {
-    ...typography.body,
+    ...textStyles.body,
     color: colors.textSecondary,
     marginBottom: spacing.xs,
   },

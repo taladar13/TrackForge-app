@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Input, Button } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 import { useDietPlans, useCreateDietPlan, useUpdateDietPlan } from '../../../api/hooks';
 import { DietPlan } from '../../../types';
 
@@ -79,13 +79,13 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   sectionTitle: {
-    ...typography.h4,
+    ...textStyles.h4,
     fontWeight: typography.fontWeight.semibold,
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
   },
   note: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
     marginBottom: spacing.md,
   },

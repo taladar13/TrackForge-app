@@ -2,7 +2,6 @@
 
 import React, { Component, ReactNode, ErrorInfo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { colors, spacing, typography } from '../theme';
 
 interface Props {
   children: ReactNode;
@@ -70,8 +69,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <TouchableOpacity
               style={styles.button}
               onPress={this.resetError}
-              accessibilityRole="button"
-              accessibilityLabel="Try again"
+              activeOpacity={0.7}
             >
               <Text style={styles.buttonText}>Try Again</Text>
             </TouchableOpacity>
@@ -87,10 +85,10 @@ export class ErrorBoundary extends Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: spacing.xl,
+    padding: 32,
   },
   content: {
     maxWidth: 400,
@@ -98,44 +96,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    ...typography.h2,
-    color: colors.error,
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#EF4444',
     textAlign: 'center',
-    marginBottom: spacing.md,
+    marginBottom: 16,
   },
   message: {
-    ...typography.body,
-    color: colors.textSecondary,
+    fontSize: 16,
+    fontWeight: '400',
+    color: '#6B7280',
     textAlign: 'center',
-    marginBottom: spacing.xl,
+    marginBottom: 32,
+    lineHeight: 24,
   },
   errorDetails: {
-    backgroundColor: colors.surface,
-    padding: spacing.md,
+    backgroundColor: '#F9FAFB',
+    padding: 16,
     borderRadius: 8,
-    marginBottom: spacing.xl,
+    marginBottom: 32,
     width: '100%',
   },
   errorText: {
-    ...typography.bodySmall,
-    color: colors.error,
-    marginBottom: spacing.sm,
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#EF4444',
+    marginBottom: 8,
   },
   stackTrace: {
-    ...typography.caption,
-    color: colors.textTertiary,
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#9CA3AF',
     fontFamily: 'monospace',
   },
   button: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.md,
+    backgroundColor: '#2563EB',
+    paddingHorizontal: 32,
+    paddingVertical: 16,
     borderRadius: 8,
     minHeight: 44,
   },
   buttonText: {
-    ...typography.button,
-    color: colors.textInverse,
-    fontWeight: typography.fontWeight.semibold,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
 });

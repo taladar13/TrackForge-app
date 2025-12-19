@@ -1,15 +1,22 @@
 // File: App.tsx
 
+import 'react-native-get-random-values';
 import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider, focusManager, onlineManager } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
-import { RootNavigator } from './src/navigation/RootNavigator';
-import { ErrorBoundary } from './src/components';
-import { offlineQueueService } from './src/services/offlineQueue';
-import { useOfflineStore } from './src/store/offlineStore';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import { AppState, AppStateStatus } from 'react-native';
+import { enableScreens } from 'react-native-screens';
 
+// Import directly to avoid potential circular dependency issues
+import { RootNavigator } from './src/navigation/RootNavigator';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { offlineQueueService } from './src/services/offlineQueue';
+import { useOfflineStore } from './src/store/offlineStore';
+
+// Disable native screens to avoid Fabric crashes while debugging
+enableScreens(false);
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -66,9 +73,47 @@ const OfflineSyncHandler: React.FC = () => {
   return null;
 };
 
+// Simple fallback component in case of errors
+const ErrorFallback: React.FC<{ error: Error; resetError: () => void }> = ({ error, resetError }) => (
+  <View style={fallbackStyles.container}>
+    <Text style={fallbackStyles.title}>Something went wrong</Text>
+    <Text style={fallbackStyles.message}>{error.message}</Text>
+    <Text style={fallbackStyles.button} onPress={resetError}>
+      Try Again
+    </Text>
+  </View>
+);
+
+const fallbackStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#EF4444',
+    marginBottom: 10,
+  },
+  message: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  button: {
+    fontSize: 16,
+    color: '#2563EB',
+    fontWeight: '600',
+  },
+});
+
 export default function App() {
   return (
-    <ErrorBoundary>
+    <ErrorBoundary fallback={ErrorFallback}>
       <QueryClientProvider client={queryClient}>
         <StatusBar style="auto" />
         <OfflineSyncHandler />
@@ -77,4 +122,3 @@ export default function App() {
     </ErrorBoundary>
   );
 }
-

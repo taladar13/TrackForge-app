@@ -3,7 +3,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
-import { colors, typography, spacing } from '../theme';
 
 interface ProgressRingProps {
   progress: number; // 0-100
@@ -20,8 +19,8 @@ export const ProgressRing: React.FC<ProgressRingProps> = ({
   progress,
   size = 100,
   strokeWidth = 8,
-  color = colors.primary,
-  backgroundColor = colors.border,
+  color = '#2563EB',
+  backgroundColor = '#E5E7EB',
   showLabel = true,
   label,
   subtitle,
@@ -77,14 +76,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   label: {
-    ...typography.h4,
-    fontWeight: typography.fontWeight.bold,
-    color: colors.text,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#111827',
   },
   subtitle: {
-    ...typography.caption,
-    color: colors.textSecondary,
-    marginTop: spacing.xs,
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#6B7280',
+    marginTop: 4,
   },
 });
-

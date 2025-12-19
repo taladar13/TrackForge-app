@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useNavigation } from '@react-navigation/native';
 import { format } from 'date-fns';
 import { Card, Button } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 import { useTodayDiet, useToggleDietItem } from '../../../api/hooks';
 
 export const DietTodayScreen: React.FC = () => {
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   summaryTitle: {
-    ...typography.h4,
+    ...textStyles.h4,
     fontWeight: typography.fontWeight.bold,
     marginBottom: spacing.md,
   },
@@ -136,17 +136,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   summaryLabel: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
   summaryValue: {
-    ...typography.h4,
+    ...textStyles.h4,
     fontWeight: typography.fontWeight.bold,
     color: colors.text,
   },
   adherenceText: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.sm,
@@ -161,11 +161,11 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   mealName: {
-    ...typography.h4,
+    ...textStyles.h4,
     fontWeight: typography.fontWeight.semibold,
   },
   mealTime: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
   },
   itemRow: {
@@ -198,19 +198,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   itemName: {
-    ...typography.body,
+    ...textStyles.body,
     fontWeight: typography.fontWeight.medium,
     marginBottom: spacing.xs,
   },
   itemQuantity: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     color: colors.textSecondary,
   },
   addButton: {
     marginTop: spacing.md,
   },
   emptyText: {
-    ...typography.body,
+    ...textStyles.body,
     color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.xl,

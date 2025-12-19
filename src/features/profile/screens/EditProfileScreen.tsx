@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Input, Button } from '../../../components';
-import { colors, spacing, typography } from '../../../theme';
+import { colors, spacing, typography, textStyles } from '../../../theme';
 import { useMe } from '../../../api/hooks';
 import { Picker } from '@react-native-picker/picker';
 import { Text } from 'react-native';
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   pickerLabel: {
-    ...typography.bodySmall,
+    ...textStyles.bodySmall,
     fontWeight: typography.fontWeight.medium,
     color: colors.textSecondary,
     marginBottom: spacing.xs,
