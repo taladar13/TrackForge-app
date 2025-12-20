@@ -7,7 +7,10 @@ import { ApiError, AuthTokens } from '../types';
 
 // Get API URL from app.json extra config, fallback to dev URL in development
 const API_BASE_URL = Constants.expoConfig?.extra?.apiUrl ||
-  (__DEV__ ? 'http://localhost:3000' : 'https://api.trackforge.com');
+  (__DEV__ ? 'http://localhost:8000' : 'https://api.trackforge.com');
+
+// API version prefix
+const API_V1_PREFIX = '/api/v1';
 
 type AxiosRequestConfigWithRetry = InternalAxiosRequestConfig & { _retry?: boolean };
 type RefreshSubscriber = (token: string) => void;
@@ -21,7 +24,7 @@ class ApiClient {
 
   constructor() {
     this.client = axios.create({
-      baseURL: API_BASE_URL,
+      baseURL: `${API_BASE_URL}${API_V1_PREFIX}`,
       timeout: 30000,
       headers: {
         'Content-Type': 'application/json',
@@ -100,10 +103,16 @@ class ApiClient {
   }
 
   private async refreshAccessToken(refreshToken: string): Promise<AuthTokens> {
-    const response = await axios.post<{ tokens: AuthTokens }>(`${API_BASE_URL}/auth/refresh`, {
-      refreshToken,
-    });
-    return response.data.tokens;
+    // Use snake_case for backend compatibility
+    const response = await axios.post<AuthTokens>(
+      `${API_BASE_URL}${API_V1_PREFIX}/auth/refresh`,
+      { refresh_token: refreshToken }
+    );
+    // Backend returns tokens directly, convert to camelCase
+    return {
+      accessToken: response.data.access_token,
+      refreshToken: response.data.refresh_token,
+    };
   }
 
   private subscribeTokenRefresh(callback: RefreshSubscriber): void {
@@ -141,8 +150,21 @@ class ApiClient {
     return response.data;
   }
 
-  async post<T>(url: string, data?: any): Promise<T> {
-    const response = await this.client.post<T>(url, data);
+  async post<T>(url: string, data?: any, options?: { idempotencyKey?: string }): Promise<T> {
+    const headers: Record<string, string> = {};
+    if (options?.idempotencyKey) {
+      headers['Idempotency-Key'] = options.idempotencyKey;
+    }
+    const response = await this.client.post<T>(url, data, { headers });
+    return response.data;
+  }
+
+  async put<T>(url: string, data?: any, options?: { idempotencyKey?: string }): Promise<T> {
+    const headers: Record<string, string> = {};
+    if (options?.idempotencyKey) {
+      headers['Idempotency-Key'] = options.idempotencyKey;
+    }
+    const response = await this.client.put<T>(url, data, { headers });
     return response.data;
   }
 
@@ -158,4 +180,3 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
-

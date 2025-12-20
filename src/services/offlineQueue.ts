@@ -10,15 +10,55 @@ import { useOfflineStore } from '../store/offlineStore';
 const OFFLINE_QUEUE_KEY = '@trackforge/offline_queue';
 
 class OfflineQueueService {
+  /**
+   * Generate a stable client UUID for a workout session.
+   * Uses proper UUID v4 for server compatibility.
+   */
+  generateSessionId(): string {
+    return uuidv4();
+  }
+
+  /**
+   * Generate a stable client UUID for a workout set.
+   */
+  generateSetId(): string {
+    return uuidv4();
+  }
+
+  /**
+   * Generate an idempotency key for a request.
+   */
+  generateIdempotencyKey(): string {
+    return uuidv4();
+  }
+
   async addWorkoutSession(sessionData: Partial<WorkoutSession>): Promise<string> {
     const queue = await this.getQueue();
+    
+    // Ensure session has a stable client UUID
+    const sessionId = sessionData.id || this.generateSessionId();
+    
+    // Ensure all sets have stable client UUIDs
+    const exercises = (sessionData.exercises || []).map(ex => ({
+      ...ex,
+      sets: (ex.sets || []).map(set => ({
+        ...set,
+        id: set.id || this.generateSetId(),
+      })),
+    }));
+
     const item: OfflineQueueItem = {
-      id: `offline_${uuidv4()}`,
+      id: sessionId, // Use session ID as queue item ID
       type: 'workout_session',
-      data: sessionData,
+      data: {
+        ...sessionData,
+        id: sessionId,
+        exercises,
+      },
       timestamp: new Date().toISOString(),
       retries: 0,
     };
+    
     const nextQueue = [...queue, item];
     await storage.setOfflineQueue(nextQueue);
     useOfflineStore.setState({ pendingSyncCount: nextQueue.length });
@@ -56,22 +96,50 @@ class OfflineQueueService {
     for (const item of queue) {
       if (item.type === 'workout_session') {
         try {
-          await workoutApi.createSession(item.data as CreateWorkoutSessionRequest);
+          const sessionData = item.data as Partial<WorkoutSession>;
+          
+          // Transform to API request format with client UUIDs
+          const requestData: Omit<CreateWorkoutSessionRequest, 'id'> & { id: string } = {
+            id: sessionData.id || item.id,
+            workout_name: sessionData.name || 'Workout',
+            date: sessionData.date || new Date().toISOString().split('T')[0],
+            program_id: sessionData.workoutId,
+            start_time: sessionData.startTime,
+            end_time: sessionData.endTime,
+            sets: (sessionData.exercises || []).flatMap((ex, exIndex) =>
+              (ex.sets || []).map((set, setIndex) => ({
+                id: set.id || this.generateSetId(),
+                exercise_id: ex.exerciseId,
+                set_number: setIndex + 1,
+                weight: set.weight,
+                reps: set.reps,
+                rpe: set.rpe,
+                completed: set.completed ?? true,
+              }))
+            ),
+          };
+
+          await workoutApi.createSession(requestData);
           workingQueue = workingQueue.filter((q) => q.id !== item.id);
           queueChanged = true;
           synced++;
-        } catch (error) {
+        } catch (error: any) {
           // Increment retry count
           item.retries = (item.retries || 0) + 1;
           failed++;
 
-          // Remove if too many retries and log warning
-          if (item.retries >= 3) {
-            console.warn(
-              `Failed to sync workout session after 3 attempts. Item ID: ${item.id}`,
-              error
-            );
-            // TODO: Consider persisting failed items in a separate storage for manual recovery
+          // Handle specific error cases
+          const isConflict = error?.response?.status === 409;
+          const isClientError = error?.response?.status >= 400 && error?.response?.status < 500;
+
+          // Remove if conflict (already exists) or too many retries
+          if (isConflict || item.retries >= 3) {
+            if (!isConflict) {
+              console.warn(
+                `Failed to sync workout session after ${item.retries} attempts. Item ID: ${item.id}`,
+                error
+              );
+            }
             workingQueue = workingQueue.filter((q) => q.id !== item.id);
           } else {
             const itemIndex = workingQueue.findIndex((q) => q.id === item.id);
