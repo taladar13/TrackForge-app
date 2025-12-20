@@ -234,3 +234,25 @@ async def is_access_token_revoked(db: AsyncSession, jti: str) -> bool:
     )
     return result.scalar_one_or_none() is not None
 
+
+async def cleanup_expired_revoked_tokens(db: AsyncSession) -> int:
+    """Remove expired entries from revoked_access_tokens."""
+    from sqlalchemy import delete
+    
+    now = datetime.now(UTC)
+    result = await db.execute(
+        delete(RevokedAccessToken).where(RevokedAccessToken.expires_at < now)
+    )
+    return result.rowcount
+
+
+async def cleanup_expired_refresh_tokens(db: AsyncSession) -> int:
+    """Remove expired refresh tokens (7+ days old)."""
+    from sqlalchemy import delete
+    
+    now = datetime.now(UTC)
+    result = await db.execute(
+        delete(RefreshToken).where(RefreshToken.expires_at < now)
+    )
+    return result.rowcount
+

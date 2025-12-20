@@ -1,5 +1,6 @@
 """FastAPI application factory."""
 
+import asyncio
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 
@@ -9,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.errors import setup_exception_handlers
 from app.core.rate_limit import close_redis, init_redis
+from app.core.tasks import start_background_tasks
 
 
 @asynccontextmanager
@@ -16,8 +18,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Application lifespan handler for startup/shutdown."""
     # Startup
     await init_redis()
+    bg_task = start_background_tasks()
+    
     yield
+    
     # Shutdown
+    bg_task.cancel()
+    try:
+        await bg_task
+    except asyncio.CancelledError:
+        pass
     await close_redis()
 
 
@@ -68,5 +78,4 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
-
 

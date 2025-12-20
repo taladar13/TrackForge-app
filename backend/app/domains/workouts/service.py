@@ -7,7 +7,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.core.errors import ConflictError, NotFoundError
-from app.core.idempotency import get_idempotency_response, store_idempotency_response
+from app.core.idempotency import (
+    mark_idempotency_failed,
+    start_idempotency_request,
+    store_idempotency_response,
+)
 from app.domains.workouts.models import (
     Exercise,
     WorkoutProgram,
@@ -214,56 +218,69 @@ async def create_workout_session(
     """
     # Check idempotency
     if idempotency_key:
-        cached = await get_idempotency_response(db, user_id, idempotency_key)
-        if cached:
-            status_code, body = cached
+        proceed, status_code, body = await start_idempotency_request(db, user_id, idempotency_key)
+        if not proceed:
+            if status_code == 409:
+                from app.core.errors import ApiError
+                from fastapi import status
+                raise ApiError(body["message"], status_code=status.HTTP_409_CONFLICT)
             return WorkoutSessionResponse.model_validate(body)
 
-    # Check if session ID already exists (client UUID collision)
-    existing = await db.execute(
-        select(WorkoutSession).where(WorkoutSession.id == data.id)
-    )
-    if existing.scalar_one_or_none():
-        # Return existing session (idempotent behavior)
-        return await get_workout_session(db, user_id, data.id)
-
-    session = WorkoutSession(
-        id=data.id,
-        user_id=user_id,
-        program_id=data.program_id,
-        workout_name=data.workout_name,
-        date=data.date,
-        start_time=data.start_time,
-        end_time=data.end_time,
-    )
-    db.add(session)
-    await db.flush()
-
-    # Create sets
-    for set_data in data.sets:
-        workout_set = WorkoutSet(
-            id=set_data.id,
-            session_id=session.id,
-            exercise_id=set_data.exercise_id,
-            set_number=set_data.set_number,
-            weight=set_data.weight,
-            reps=set_data.reps,
-            rpe=set_data.rpe,
-            completed=set_data.completed,
+    try:
+        # Check if session ID already exists (client UUID collision)
+        existing = await db.execute(
+            select(WorkoutSession).where(WorkoutSession.id == data.id)
         )
-        db.add(workout_set)
+        if existing.scalar_one_or_none():
+            # Return existing session (idempotent behavior)
+            response = await get_workout_session(db, user_id, data.id)
+            if idempotency_key:
+                await store_idempotency_response(
+                    db, user_id, idempotency_key, 201, response.model_dump(mode="json")
+                )
+            return response
 
-    await db.flush()
-
-    response = await get_workout_session(db, user_id, session.id)
-
-    # Store idempotency response
-    if idempotency_key:
-        await store_idempotency_response(
-            db, user_id, idempotency_key, 201, response.model_dump(mode="json")
+        session = WorkoutSession(
+            id=data.id,
+            user_id=user_id,
+            program_id=data.program_id,
+            workout_name=data.workout_name,
+            date=data.date,
+            start_time=data.start_time,
+            end_time=data.end_time,
         )
+        db.add(session)
+        await db.flush()
 
-    return response
+        # Create sets
+        for set_data in data.sets:
+            workout_set = WorkoutSet(
+                id=set_data.id,
+                session_id=session.id,
+                exercise_id=set_data.exercise_id,
+                set_number=set_data.set_number,
+                weight=set_data.weight,
+                reps=set_data.reps,
+                rpe=set_data.rpe,
+                completed=set_data.completed,
+            )
+            db.add(workout_set)
+
+        await db.flush()
+
+        response = await get_workout_session(db, user_id, session.id)
+
+        # Store idempotency response
+        if idempotency_key:
+            await store_idempotency_response(
+                db, user_id, idempotency_key, 201, response.model_dump(mode="json")
+            )
+
+        return response
+    except Exception:
+        if idempotency_key:
+            await mark_idempotency_failed(db, user_id, idempotency_key)
+        raise
 
 
 async def get_workout_session(db: AsyncSession, user_id: str, session_id: str) -> WorkoutSessionResponse:
@@ -304,62 +321,70 @@ async def update_workout_session(
     """Update a workout session with idempotency support."""
     # Check idempotency
     if idempotency_key:
-        cached = await get_idempotency_response(db, user_id, idempotency_key)
-        if cached:
-            status_code, body = cached
+        proceed, status_code, body = await start_idempotency_request(db, user_id, idempotency_key)
+        if not proceed:
+            if status_code == 409:
+                from app.core.errors import ApiError
+                from fastapi import status
+                raise ApiError(body["message"], status_code=status.HTTP_409_CONFLICT)
             return WorkoutSessionResponse.model_validate(body)
 
-    result = await db.execute(
-        select(WorkoutSession)
-        .options(selectinload(WorkoutSession.sets))
-        .where(WorkoutSession.id == session_id, WorkoutSession.user_id == user_id)
-    )
-    session = result.scalar_one_or_none()
-
-    if not session:
-        raise NotFoundError("Workout session not found")
-
-    if data.end_time is not None:
-        session.end_time = data.end_time
-
-    if data.sets is not None:
-        # Upsert sets by ID (last-write-wins)
-        existing_set_ids = {s.id for s in session.sets}
-
-        for set_data in data.sets:
-            if set_data.id in existing_set_ids:
-                # Update existing set
-                for existing_set in session.sets:
-                    if existing_set.id == set_data.id:
-                        existing_set.weight = set_data.weight
-                        existing_set.reps = set_data.reps
-                        existing_set.rpe = set_data.rpe
-                        existing_set.completed = set_data.completed
-                        break
-            else:
-                # Create new set
-                new_set = WorkoutSet(
-                    id=set_data.id,
-                    session_id=session.id,
-                    exercise_id=set_data.exercise_id,
-                    set_number=set_data.set_number,
-                    weight=set_data.weight,
-                    reps=set_data.reps,
-                    rpe=set_data.rpe,
-                    completed=set_data.completed,
-                )
-                db.add(new_set)
-
-    await db.flush()
-
-    response = await get_workout_session(db, user_id, session_id)
-
-    if idempotency_key:
-        await store_idempotency_response(
-            db, user_id, idempotency_key, 200, response.model_dump(mode="json")
+    try:
+        result = await db.execute(
+            select(WorkoutSession)
+            .options(selectinload(WorkoutSession.sets))
+            .where(WorkoutSession.id == session_id, WorkoutSession.user_id == user_id)
         )
+        session = result.scalar_one_or_none()
 
-    return response
+        if not session:
+            raise NotFoundError("Workout session not found")
+
+        if data.end_time is not None:
+            session.end_time = data.end_time
+
+        if data.sets is not None:
+            # Upsert sets by ID (last-write-wins)
+            existing_set_ids = {s.id for s in session.sets}
+
+            for set_data in data.sets:
+                if set_data.id in existing_set_ids:
+                    # Update existing set
+                    for existing_set in session.sets:
+                        if existing_set.id == set_data.id:
+                            existing_set.weight = set_data.weight
+                            existing_set.reps = set_data.reps
+                            existing_set.rpe = set_data.rpe
+                            existing_set.completed = set_data.completed
+                            break
+                else:
+                    # Create new set
+                    new_set = WorkoutSet(
+                        id=set_data.id,
+                        session_id=session.id,
+                        exercise_id=set_data.exercise_id,
+                        set_number=set_data.set_number,
+                        weight=set_data.weight,
+                        reps=set_data.reps,
+                        rpe=set_data.rpe,
+                        completed=set_data.completed,
+                    )
+                    db.add(new_set)
+
+        await db.flush()
+
+        response = await get_workout_session(db, user_id, session_id)
+
+        if idempotency_key:
+            await store_idempotency_response(
+                db, user_id, idempotency_key, 200, response.model_dump(mode="json")
+            )
+
+        return response
+    except Exception:
+        if idempotency_key:
+            await mark_idempotency_failed(db, user_id, idempotency_key)
+        raise
 
 
 async def list_workout_sessions(
