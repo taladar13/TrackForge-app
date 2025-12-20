@@ -168,6 +168,11 @@ async def process_menu_ocr(
     
     For MVP: synchronous processing with mock provider.
     Future: async processing with Celery worker.
+
+    WARNING: Currently uses local file storage. In a distributed environment 
+    (multiple instances), this will fail as the image will only be available on 
+    the instance that received the upload. For production, migrate to an 
+    object storage service (e.g., AWS S3, Google Cloud Storage, or MinIO).
     """
     ensure_upload_dir()
 
@@ -219,6 +224,8 @@ async def process_workout_ocr(
     
     For MVP: synchronous processing with mock provider.
     Future: async processing with Celery worker.
+
+    WARNING: Currently uses local file storage (see process_menu_ocr).
     """
     ensure_upload_dir()
 
