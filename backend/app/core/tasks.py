@@ -30,6 +30,9 @@ async def cleanup_task() -> None:
                     logger.info(f"Deleted {deleted_tokens} expired revoked tokens")
 
             logger.info("Background cleanup completed")
+        except asyncio.CancelledError:
+            # Allow cancellation to propagate so shutdown can complete cleanly.
+            raise
         except Exception as e:
             logger.error(f"Error in background cleanup task: {e}")
 

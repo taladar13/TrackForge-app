@@ -1,5 +1,6 @@
 """FastAPI application factory."""
 
+import asyncio
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 
@@ -77,5 +78,4 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
-
 
